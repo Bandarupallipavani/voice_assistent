@@ -1,4 +1,5 @@
-const recognition = new webkitSpeechRecognition();
+// Browser Speech Recognition
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 recognition.lang = "en-US";
 
 function startListening() {
@@ -8,15 +9,24 @@ function startListening() {
 recognition.onresult = async (event) => {
   const text = event.results[0][0].transcript;
 
-  const res = await fetch("/command", {
+  document.getElementById("userText").innerText = text;
+
+  // Send to backend
+  const response = await fetch("http://127.0.0.1:8000/command", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({ text })
   });
 
-  const data = await res.json();
+  const data = await response.json();
+  document.getElementById("aiText").innerText = data.response;
+
+  // Speak response
   speak(data.response);
 
+  // Open link if exists
   if (data.url) {
     window.open(data.url, "_blank");
   }

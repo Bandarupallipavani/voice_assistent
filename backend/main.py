@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import webbrowser
+from intent import detect_intent
+from actions import perform_action
+from llm import ask_llm
 
 app = FastAPI()
 
@@ -9,13 +11,12 @@ class Command(BaseModel):
 
 @app.post("/command")
 def process_command(cmd: Command):
-    text = cmd.text.lower()
+    intent = detect_intent(cmd.text)
+    action = perform_action(intent, cmd.text)
 
-    if "youtube" in text:
-        return {"response": "Opening YouTube", "url": "https://youtube.com"}
+    if action:
+        return action
 
-    elif "google" in text:
-        return {"response": "Opening Google", "url": "https://google.com"}
-
-    else:
-        return {"response": "Sorry, I didn't understand"}
+    # fallback to LLM
+    reply = ask_llm(cmd.text)
+    return {"response": reply}
