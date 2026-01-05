@@ -12,7 +12,7 @@ recognition.onresult = async (event) => {
   document.getElementById("userText").innerText = text;
 
   // Send to backend
-  const response = await fetch("https://your-app-name.onrender.com/command", {
+  const response = await fetch("https://voice-assistent-mnx8.onrender.com/command", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
